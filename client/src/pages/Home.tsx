@@ -10,7 +10,7 @@ import managerShark from "../assets/manager_shark.png";
 import managerCrocodile from "../assets/manager_crocodile.png";
 import { Phone, AlertTriangle, LifeBuoy, CheckCircle2, Lightbulb, ArrowRight } from "lucide-react";
 import { UNDO_QUOTES } from "@/data/undoQuotes";
-import { runTransitionSequence } from "@/lib/transitionSequence";
+import { runTransitionSequence, type TransitionStep } from "@/lib/transitionSequence";
 
 export default function Home() {
   const [editorText, setEditorText] = useState("");
@@ -22,6 +22,7 @@ export default function Home() {
   const [showLifeAdvice, setShowLifeAdvice] = useState(false);
   const [currentAdvice, setCurrentAdvice] = useState(UNDO_QUOTES[0]);
   const [showTransition, setShowTransition] = useState(false);
+  const [transitionStep, setTransitionStep] = useState<TransitionStep | null>(null);
   const lastFocusPopupTime = useRef(0);
   const lastAdviceIndex = useRef(0);
 
@@ -41,6 +42,7 @@ export default function Home() {
 
   const handleTransitionComplete = useCallback(() => {
     setShowTransition(false);
+    setTransitionStep(null);
   }, []);
 
   useEffect(() => {
@@ -82,6 +84,8 @@ export default function Home() {
   const leftChar = phase === "MANAGERS" ? managerShark : friendF;
   const rightChar = phase === "MANAGERS" ? managerCrocodile : friendM;
 
+  const showCharacters = phase !== "TRANSITION" || transitionStep === "SLIDE";
+
   return (
     <div className={`w-full h-screen overflow-hidden flex flex-col relative transition-colors duration-500
       ${phase === "MANAGERS" ? "bg-yellow-50" : "bg-white"}
@@ -112,7 +116,7 @@ export default function Home() {
 
       <main className="flex-1 relative flex items-center justify-center p-8 md:p-12 lg:p-16">
         <AnimatePresence>
-          {phase !== "TRANSITION" && (
+          {showCharacters && (
             <>
               <motion.div 
                 initial={{ x: -100, opacity: 0 }}
@@ -157,7 +161,7 @@ export default function Home() {
         {/* Transition Sequence */}
         <AnimatePresence>
           {showTransition && (
-            <TransitionSequence onComplete={handleTransitionComplete} />
+            <TransitionSequence onComplete={handleTransitionComplete} onStepChange={setTransitionStep} />
           )}
         </AnimatePresence>
 
@@ -293,7 +297,13 @@ export default function Home() {
   );
 }
 
-export function TransitionSequence({ onComplete }: { onComplete: () => void }) {
+export function TransitionSequence({
+  onComplete,
+  onStepChange,
+}: {
+  onComplete: () => void;
+  onStepChange?: (step: TransitionStep) => void;
+}) {
   const [step, setStep] = useState<'FLASH' | 'CALLING' | 'SLIDE' | 'NONE'>('CALLING');
 
   useEffect(() => {
@@ -311,6 +321,10 @@ export function TransitionSequence({ onComplete }: { onComplete: () => void }) {
       },
     });
   }, [onComplete]);
+
+  useEffect(() => {
+    onStepChange?.(step);
+  }, [onStepChange, step]);
 
   if (step === 'NONE') {
     return null;

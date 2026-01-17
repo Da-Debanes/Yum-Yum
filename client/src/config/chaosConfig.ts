@@ -20,7 +20,7 @@ export const chaosConfig = {
 
   // Transition Sequence
   transitionFlashDuration: 400,
-  transitionCallingDuration: 400,
+  transitionCallingDuration: 800,
   transitionSlideDuration: 400,
   
   // Chaos Sabotage
