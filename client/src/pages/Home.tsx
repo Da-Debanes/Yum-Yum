@@ -10,6 +10,7 @@ import managerShark from "../assets/manager_shark.png";
 import managerCrocodile from "../assets/manager_crocodile.png";
 import { Phone, AlertTriangle, LifeBuoy, CheckCircle2, Lightbulb, ArrowRight } from "lucide-react";
 import { UNDO_QUOTES } from "@/data/undoQuotes";
+import { runTransitionSequence } from "@/lib/transitionSequence";
 
 export default function Home() {
   const [editorText, setEditorText] = useState("");
@@ -288,27 +289,28 @@ export default function Home() {
   );
 }
 
-function TransitionSequence({ onComplete }: { onComplete: () => void }) {
-  const [step, setStep] = useState<'FLASH' | 'CALLING' | 'SLIDE' | 'NONE'>('FLASH');
+export function TransitionSequence({ onComplete }: { onComplete: () => void }) {
+  const [step, setStep] = useState<'FLASH' | 'CALLING' | 'SLIDE' | 'NONE'>('CALLING');
 
   useEffect(() => {
     const flashDuration = chaosConfig.transitionFlashDuration || 800;
     const callingDuration = chaosConfig.transitionCallingDuration || 500;
     const slideDuration = chaosConfig.transitionSlideDuration || 1000;
 
-    const flashTimer = setTimeout(() => setStep('CALLING'), flashDuration);
-    const callingTimer = setTimeout(() => setStep('SLIDE'), flashDuration + callingDuration);
-    const slideTimer = setTimeout(() => {
-      setStep('NONE');
-      onComplete();
-    }, flashDuration + callingDuration + slideDuration);
-
-    return () => {
-      clearTimeout(flashTimer);
-      clearTimeout(callingTimer);
-      clearTimeout(slideTimer);
-    };
+    return runTransitionSequence({
+      onStep: setStep,
+      onComplete,
+      timings: {
+        flashDuration,
+        callingDuration,
+        slideDuration,
+      },
+    });
   }, [onComplete]);
+
+  if (step === 'NONE') {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-[1000] pointer-events-none">
