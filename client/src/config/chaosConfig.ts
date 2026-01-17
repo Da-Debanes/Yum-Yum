@@ -27,6 +27,7 @@ export const chaosConfig = {
   sabotageWhileTypingEnabled: true,
   sabotageWhileTypingIntervalMs: 6000,
   sabotageWhileTypingChance: 0.3,
+  sabotageIdleInsertChance: 0.1,
   maxInsertedLength: 3,
   
   // Time Check

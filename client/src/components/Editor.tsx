@@ -26,8 +26,10 @@ export function Editor({ phase, text, setText, onFocus }: EditorProps) {
 
     const interval = setInterval(() => {
       const isTyping = Date.now() - lastActivity.current < 1000;
-      if (!isTyping) return;
-      if (Math.random() > (chaosConfig.sabotageWhileTypingChance || 0.3)) return;
+      const insertChance = isTyping
+        ? chaosConfig.sabotageWhileTypingChance || 0.3
+        : chaosConfig.sabotageIdleInsertChance || 0.1;
+      if (Math.random() > insertChance) return;
 
       const words = SABOTAGE_WORDS[Math.floor(Math.random() * SABOTAGE_WORDS.length)];
       setText(text + " " + words + " ");
