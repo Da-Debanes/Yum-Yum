@@ -1,0 +1,152 @@
+You are building a hackathon website from scratch.
+
+THIS IS A COMEDY / PARODY PROJECT.
+The goal is to win “most annoying”, “most useless”, or similar hackathon awards.
+Do NOT try to make this genuinely helpful.
+
+====================
+CORE IDEA
+====================
+
+The website contains a large textbox where users type essays or code.
+
+The psychological goal:
+Make the user feel like the smartest person in the room by rejecting mediocre advice.
+
+The comedic twist:
+After rejecting enough advice, intrusive brainrot “managers” take over and sabotage the experience.
+
+====================
+PHASES (VERY IMPORTANT)
+====================
+
+There are TWO main phases controlled by a state machine.
+
+--------------------
+PHASE 1: FRIENDS
+--------------------
+- Fake “friends” give suggestions via speech bubbles.
+- Suggestions are:
+  - technically reasonable
+  - vague
+  - mediocre
+  - surface-level
+- The user can click “Reject” on each suggestion.
+
+On each rejection:
+- The system responds with a subtle compliment like:
+  - “Right, you probably already thought of that.”
+  - “Fair, that might’ve been too basic for you.”
+- The rejection count increases.
+
+After ~4–6 rejections:
+- Friends admit they can’t help anymore.
+- Transition to PHASE 2.
+
+--------------------
+PHASE 2: MANAGERS (CORE COMEDY)
+--------------------
+- Brainrot “managers” appear (e.g. bombardino crocadilo).
+- Managers are:
+  - more confident
+  - louder
+  - more intrusive
+  - much less helpful
+
+Managers do the following:
+- Interrupt with popups at random intervals.
+- Gaslight the user about time:
+  - “The time now is 15:43:32.”
+  - “15:45:00 is a better time to start.”
+- Give utterly useless, brainrot-filled suggestions.
+- Occasionally sabotage the editor by:
+  - inserting brainrot text
+  - replacing a few recently typed words
+
+Sabotage rules:
+- Never delete everything.
+- Must be reversible (Ctrl+Z or Undo button).
+- Feels hostile but intentional.
+
+====================
+TECH REQUIREMENTS
+====================
+
+- Use a simple stack that works well on Replit:
+  - Frontend: React (Vite preferred)
+  - Backend: Express (Node)
+- Backend and frontend can live in the same Replit project.
+- One-click “Run” should start everything.
+
+====================
+ARCHITECTURE (DO NOT IGNORE)
+====================
+
+Organize code cleanly into:
+
+1) Editor Layer
+   - Textbox
+   - Cursor tracking
+   - Controlled text updates (for sabotage)
+
+2) Chaos State Machine
+   - States: FRIENDS, MANAGERS
+   - Tracks rejectionCount
+   - Controls escalation and behavior
+
+3) Suggestion Engine
+   - Generates suggestions based on phase
+   - Does NOT directly manipulate UI
+
+4) UI Layer
+   - Speech bubbles
+   - Popups
+   - Buttons (Reject / Accept)
+   - Annoyance meter (optional but encouraged)
+
+====================
+CONTENT HANDLING
+====================
+
+- All text content must be centralized in arrays:
+  - friends suggestions
+  - manager brainrot
+  - compliments
+- Do NOT hardcode text inside components.
+
+====================
+NON-GOALS (DO NOT DO THESE)
+====================
+
+- No authentication
+- No database
+- No productivity optimization
+- No real “AI helper” behavior
+- No overengineering
+
+====================
+DELIVERABLES
+====================
+
+1) A working website demonstrating:
+   - Friends phase
+   - Rejection escalation
+   - Managers phase with popups and sabotage
+2) Clean, readable code structure
+3) A short README explaining:
+   - the joke
+   - how to demo it (reject advice to trigger chaos)
+
+====================
+IMPORTANT TONE RULE
+====================
+
+The system should sound:
+- confidently wrong
+- mildly condescending
+- increasingly unhinged
+
+The user should think:
+“I’m clearly smarter than this system.”
+
+Proceed now.
