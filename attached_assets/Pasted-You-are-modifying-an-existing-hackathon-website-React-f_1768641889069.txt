@@ -1,0 +1,108 @@
+You are modifying an existing hackathon website (React frontend, possibly Express backend) with “friends → managers → chaos” behavior. Implement the following changes cleanly and modularly. Do not hack features directly into components; use a config file + reusable components.
+
+========================================================
+1) Centralized Tuning / Parameters File (MUST HAVE)
+========================================================
+Create a single dedicated config file that controls key behavior parameters, e.g.
+- typing debounce before friends send suggestions
+- interval between suggestion attempts
+- number of rejections before switching to managers
+- chaos-mode popup cooldown
+- sabotage frequency (if present)
+
+Name suggestion: src/config/chaosConfig.(js|ts)
+
+Also add a short README section “How to tune the app” that explains:
+- where the file is
+- what each parameter does
+- an example change (e.g. reduce debounce from 1000ms to 400ms)
+
+========================================================
+2) Friends should respond faster
+========================================================
+Reduce the waiting time before friends start giving suggestions.
+Use the config value from (1). The default should feel “snappy” (e.g. 300–700ms after typing stops).
+Ensure suggestions do not spam: keep a reasonable cooldown/interval, also configurable.
+
+========================================================
+3) Manager Transition Animation Sequence (CINEMATIC)
+========================================================
+When switching from FRIENDS to MANAGERS, implement a short sequence:
+A) A “phone call” animation: a phone icon goes to the friends/characters (can be simple CSS animation).
+B) Screen overlay turns red.
+C) Show a centered popup: “Managers to the rescue”.
+D) Friends slide to the left and right edges (respectively) to make space.
+E) Manager enters the scene from the bottom (slide-up animation).
+
+Keep this as a small reusable “TransitionSequence” component (or similar), triggered once when phase changes.
+Do not block typing permanently; sequence can overlay temporarily but should end cleanly.
+
+========================================================
+4) Chaos Mode: Editor Click Triggers Time-Gaslighting Popup
+========================================================
+In chaos mode, whenever the user clicks/focuses the textbox:
+- Show a popup that includes the ACTUAL current time (HH:MM:SS).
+- Message example:
+  “Are you sure you want to work? It’s only 15:43:37. Let’s start at 15:45:00.”
+- If user clicks “Yes”, show a second popup that escalates annoyance:
+  “This does not pass the vibe check. Say ‘please’ at least three times if you really want to start work (not like it’s productive to start so early).”
+Implement the “please three times” as a small input field in the popup:
+- User must type “please” three times (e.g. “please please please”) to dismiss it.
+- Make this whole behavior configurable (enable/disable + cooldown) in chaosConfig.
+
+Add a cooldown so repeated clicks don’t fire popups every single time (configurable, e.g. 8–20 seconds).
+
+========================================================
+5) Avoid boss suggestions overlapping (NO OVERLAP)
+========================================================
+In managers/chaos mode, multiple boss suggestion bubbles must not cover each other.
+Implement a layout system that:
+- pins bubbles along the left/right sides (or side-ish)
+- assigns each bubble a slot/position so they never overlap
+- supports multiple bubbles on screen simultaneously without collisions
+
+Implementation options:
+- a “stacked lane” layout (left lane + right lane)
+- or a simple grid/slot system with fixed vertical spacing
+Choose a reliable approach; do not rely on random absolute positions that can overlap.
+
+========================================================
+6) Boss rejection feedback becomes more brainrot over time
+========================================================
+When boss suggestions are rejected, their response text should escalate in brainrot intensity.
+Implement a “brainrot level” that increases with each boss rejection and affects:
+- the wording of the boss’s follow-up messages
+- optionally the frequency of popups/sabotage (if you already have sabotage)
+
+Store brainrot content in a content file (not in components) and select based on level.
+
+========================================================
+7) Chaos Mode Easter Egg: Blue Underline on Correctly Spelled Word
+========================================================
+Sometimes in chaos mode (random chance, configurable), when the user spells a word correctly:
+- add a BLUE underline to that word
+- on hover, show a tooltip:
+  “The word is spelled correctly. Good job!”
+
+Notes:
+- This is intentionally pointless.
+- Keep it lightweight: do NOT build a full spellchecker.
+- Use a simple heuristic:
+  - choose a random recently typed word of length >= 4
+  - treat it as “correct” if it matches a small internal dictionary list OR if it contains only letters and no obvious errors
+  - then underline it and show the tooltip on hover
+If your editor is a plain <textarea>, implement this as an overlay/highlight layer:
+- render formatted text behind/above the textarea to show underlines, while textarea holds the real text
+If you are using a rich editor (Monaco/CodeMirror), use its decoration API.
+
+========================================================
+DELIVERABLES / ACCEPTANCE
+========================================================
+- All new behavior is driven by the central config file.
+- Friends respond faster (noticeably).
+- Manager transition sequence is visible and polished.
+- Chaos-mode focus popup uses real current time and the “please x3” gate works.
+- Boss bubbles never overlap.
+- Boss rejection messages escalate in brainrot intensity.
+- Blue underline Easter egg appears sometimes and shows tooltip on hover.
+- Provide brief notes in README: tuning + how to demo each feature quickly.
