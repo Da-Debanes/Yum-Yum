@@ -24,16 +24,19 @@ export default function Home() {
   const lastFocusPopupTime = useRef(0);
   const lastAdviceIndex = useRef(0);
 
+  const [hasTransitioned, setHasTransitioned] = useState(false);
+
   useEffect(() => {
     if (phase === "MANAGERS") document.body.classList.add("manager-mode");
     else document.body.classList.remove("manager-mode");
   }, [phase]);
 
   useEffect(() => {
-    if (phase === "TRANSITION") {
+    if (phase === "TRANSITION" && !hasTransitioned) {
       setShowTransition(true);
+      setHasTransitioned(true);
     }
-  }, [phase]);
+  }, [phase, hasTransitioned]);
 
   useEffect(() => {
     const timer = setInterval(() => {
