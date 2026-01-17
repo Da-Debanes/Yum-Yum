@@ -103,9 +103,6 @@ export function Editor({ phase, text, setText, onFocus }: EditorProps) {
       </div>
 
       <div className="flex-1 relative">
-        <div className="absolute inset-0 pt-8 px-12 pb-12 text-lg leading-relaxed text-transparent whitespace-pre-wrap pointer-events-none break-words overflow-hidden">
-          {highlightedText}
-        </div>
         <textarea
           ref={textareaRef}
           value={text}
@@ -117,6 +114,17 @@ export function Editor({ phase, text, setText, onFocus }: EditorProps) {
           spellCheck={false}
           placeholder="Start writing your essay here..."
         />
+        <div className="absolute inset-0 pt-8 px-12 pb-12 text-lg leading-relaxed text-transparent whitespace-pre-wrap break-words overflow-hidden z-20 pointer-events-none">
+          {highlightedText.map((node, i) => {
+            if (React.isValidElement(node) && (node.props as any).className?.includes('border-b-2')) {
+              return React.cloneElement(node as React.ReactElement<any>, { 
+                key: i,
+                className: (node.props as any).className.replace('cursor-help', 'cursor-help pointer-events-auto')
+              });
+            }
+            return node;
+          })}
+        </div>
       </div>
 
       {tooltip && (
