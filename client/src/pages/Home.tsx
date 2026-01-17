@@ -29,7 +29,7 @@ export default function Home() {
     `}>
       <header className="h-14 border-b bg-background/80 backdrop-blur-md flex items-center px-6 justify-between z-30 shrink-0 shadow-sm">
         <h1 className="font-display font-bold text-lg tracking-tight flex items-center gap-2">
-          {phase === "MANAGERS" ? "🚀 10X SYNERGY STUDIO" : "CodeEditor Pro"}
+          {phase === "MANAGERS" ? "🚀 10X SYNERGY STUDIO" : "EliteCritique.AI"}
         </h1>
         
         <div className="flex items-center gap-6">
