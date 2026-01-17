@@ -28,7 +28,6 @@ export function useChaosMachine(currentText: string) {
   const usedFriendSuggestions = useRef<Set<string>>(new Set());
   const usedManagerSuggestions = useRef<Set<string>>(new Set());
 
-  // Activity detection
   useEffect(() => {
     if (currentText.trim().length > 0) {
       hasTyped.current = true;
@@ -36,7 +35,6 @@ export function useChaosMachine(currentText: string) {
     }
   }, [currentText]);
 
-  // Phase transition
   useEffect(() => {
     if (phase === "FRIENDS" && rejectionCount >= chaosConfig.rejectionsToManagers) {
       setPhase("TRANSITION");
@@ -53,7 +51,6 @@ export function useChaosMachine(currentText: string) {
     return selection;
   };
 
-  // Suggestion loop
   useEffect(() => {
     if (phase === "TRANSITION") return;
     if (phase === "FRIENDS" && !hasTyped.current) return;
@@ -62,6 +59,13 @@ export function useChaosMachine(currentText: string) {
       const now = Date.now();
       const isTyping = now - lastActivityTime.current < 1000;
       
+      // Enforce global caps
+      if (phase === "MANAGERS") {
+        if (suggestions.length >= (chaosConfig.maxBossBubblesOnScreen || 1)) return;
+      } else {
+        if (suggestions.length >= 1) return;
+      }
+
       // Check if we should suggest based on mode
       if (phase === "FRIENDS") {
         const cooldown = isTyping ? chaosConfig.friendsWhileTypingIntervalMs : chaosConfig.friendSuggestionInterval;
@@ -69,22 +73,16 @@ export function useChaosMachine(currentText: string) {
         if (isTyping && !chaosConfig.friendsSuggestWhileTyping) return;
         if (isTyping && Math.random() > chaosConfig.friendsWhileTypingChance) return;
       } else {
-        if (now - lastSuggestionTime.current < 2000) return;
+        if (now - lastSuggestionTime.current < 5000) return; // Slower boss cadence
       }
 
       lastSuggestionTime.current = now;
       let text = "";
       
       if (phase === "FRIENDS") {
-        const lowerText = currentText.toLowerCase();
-        if (lowerText.includes("function") || lowerText.includes("=>")) {
-          text = "I noticed you're using functions. Have you considered a 'Factory Pattern'? It adds 400 lines but feels very professional.";
-        } else {
-          text = getUniqueSuggestion(FRIEND_SUGGESTIONS, usedFriendSuggestions.current);
-        }
+        text = getUniqueSuggestion(FRIEND_SUGGESTIONS, usedFriendSuggestions.current);
       } else {
         text = getUniqueSuggestion(MANAGER_BRAINROT, usedManagerSuggestions.current);
-        if (managerRejectionCount > 3) text = text.toUpperCase() + " !!! " + (Math.random() > 0.5 ? "SKIBIDI" : "RIZZ");
       }
       
       const nextSide = lastSuggestionSide.current === "LEFT" ? "RIGHT" : "LEFT";
@@ -95,21 +93,16 @@ export function useChaosMachine(currentText: string) {
         text,
         type: phase === "FRIENDS" ? "FRIEND" : "MANAGER",
         side: nextSide,
-        slot: Math.floor(Math.random() * 3),
+        slot: 0,
         x: chaosConfig.bossRandomSpawnEnabled && phase === "MANAGERS" ? 10 + Math.random() * 80 : undefined,
         y: chaosConfig.bossRandomSpawnEnabled && phase === "MANAGERS" ? 15 + Math.random() * 70 : undefined
       };
 
-      setSuggestions((prev) => {
-        const max = phase === "FRIENDS" ? 1 : 8;
-        if (prev.length >= max) return prev;
-        if (phase === "FRIENDS" && prev.length > 0) return prev;
-        return [...prev, newSuggestion];
-      });
-    }, 500);
+      setSuggestions((prev) => [...prev, newSuggestion]);
+    }, 1000);
 
     return () => clearInterval(interval);
-  }, [phase, currentText, managerRejectionCount]);
+  }, [phase, currentText, suggestions.length]);
 
   const rejectSuggestion = useCallback((id: string) => {
     setSuggestions((prev) => prev.filter((s) => s.id !== id));

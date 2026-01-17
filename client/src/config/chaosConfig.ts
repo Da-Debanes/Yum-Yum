@@ -1,32 +1,37 @@
 export const chaosConfig = {
   // Friends Phase
   typingDebounce: 300,
-  friendSuggestionInterval: 2000,
+  friendSuggestionInterval: 5000, // Slower for clean demo
   rejectionsToManagers: 5,
   friendsSuggestWhileTyping: true,
-  friendsWhileTypingIntervalMs: 3000,
-  friendsWhileTypingChance: 0.7,
+  friendsWhileTypingIntervalMs: 8000, // Much slower
+  friendsWhileTypingChance: 0.5,
   
   // Managers Phase
   managerTransitionDuration: 3000,
-  chaosPopupCooldown: 15000,
-  gaslightingProbability: 0.3,
-  sabotageFrequency: 3000,
-  bossSpawnSafeMarginPx: 20,
-  bossSpawnHeaderExclusionPx: 60,
+  chaosPopupCooldown: 30000, // Longer cooldown
+  gaslightingProbability: 0.2,
+  sabotageFrequency: 5000,
+  bossSpawnSafeMarginPx: 40,
+  bossSpawnHeaderExclusionPx: 80,
   bossRandomSpawnEnabled: true,
+  maxBossesOnScreen: 1,
+  maxBossBubblesOnScreen: 1,
   
   // Chaos Sabotage
   sabotageWhileTypingEnabled: true,
-  sabotageWhileTypingIntervalMs: 4000,
-  sabotageWhileTypingChance: 0.4,
+  sabotageWhileTypingIntervalMs: 10000,
+  sabotageWhileTypingChance: 0.2,
   
   // Time Check
-  timeCheckUpdateIntervalMs: 500,
+  timeCheckUpdateIntervalMs: 1000,
+  
+  // Undo/Life Advice
+  lifeAdviceEnabled: true,
   
   // Easter Eggs
-  blueUnderlineProbability: 0.2,
-  correctWordUnderlineChance: 0.3,
+  blueUnderlineProbability: 0.1,
+  correctWordUnderlineChance: 0.2,
   correctWordMinLength: 4,
   correctWordTooltipEnabled: true,
   

@@ -1,0 +1,106 @@
+You are updating an existing hackathon web app (currently “code/essay editor” with bosses/sharks/planes and chaos mode). We are PIVOTING the product philosophy and need a CLEAN, NON-SPAMMY demo.
+
+HIGH PRIORITY GOALS
+1) Pivot: NO coding editor, NO coding advice. This is now ONLY an ESSAY editor + “Grammarly-style” critique UI, but the critique is hilariously useless.
+2) Make the demo clean: significantly reduce spam/popups. Chaos mode should be annoying but still watchable and not a clutter mess.
+3) Keep the app feeling “smartest person in the room” in phase 1: it genuinely tries to critique, but fails in an overconfident way.
+
+========================================================
+A) PIVOT TO ESSAY-ONLY (MUST IMPLEMENT)
+========================================================
+- Remove all code-related language/UI:
+  - “main.ts”, “code editor”, code-mode toggles, code-themed labels
+  - any suggestions referencing scalability/web3/engineering/etc.
+- Replace with an “Essay / Document” theme:
+  - title like “EliteCritique.AI” can stay, but the editor is clearly an essay box
+  - placeholder: “Start writing your essay here…”
+  - word count, character count stay, but remove file-extension vibes (no .ts)
+- Suggestion engine must ONLY generate “Grammarly-like” critique categories, but useless:
+  Examples categories:
+  - Clarity, Tone, Conciseness, Flow, Formality, Thesis, Transitions
+  Examples useless critiques:
+  - “Consider making this more ‘clear’.”
+  - “The tone could be more tone-like.”
+  - “Try adding a stronger transition… somewhere.”
+
+Make this content-driven: update content files/arrays accordingly.
+
+========================================================
+B) MAKE THE START EXPERIENCE CLEAN + PROFESSIONAL (PHASE 1)
+========================================================
+The initial phase should LOOK like a polished Grammarly competitor:
+- clean white/gray UI, professional typography
+- subtle suggestion bubble style (less aggressive borders)
+- suggestions appear at a reasonable cadence (not constant spam)
+
+Keep “reject” and “apply”, but:
+- rejecting gives morale-boosting messages (“you’re already ahead”, “fair, that’s too basic for you”)
+- applying should still be useless (like replacing a word with a worse synonym)
+
+========================================================
+C) CHAOS MODE: REDUCE SPAM + LIMIT BOSSES
+========================================================
+Chaos mode is currently too spammy. Change it so:
+- At any moment, there is at most ONE boss character on screen (one shark and/or plane at most).
+- At any moment, there is at most ONE active boss suggestion bubble.
+- Boss suggestion cadence should be slower and more deliberate (still annoying, but not flooding).
+- Any time-check / popup should respect cooldowns so it’s not firing repeatedly.
+
+Implement and enforce global caps:
+- maxBossesOnScreen = 1
+- maxBossBubblesOnScreen = 1
+- popupCooldownMs increased (config-driven)
+
+Update the spawn logic to respect these caps.
+
+========================================================
+D) UNDO BUTTON: “LIFE ADVICE” INSTEAD OF UNDOING
+========================================================
+When the user clicks the “Undo” button:
+- Do NOT perform undo immediately.
+- Show a modal/popup with life advice, e.g.
+  “In life, there are no mistakes.”
+  “Undo is a mindset.”
+  “Reflection is the real rollback.”
+- Provide buttons like:
+  - “Accept reality” (closes popup, does NOT undo)
+  - “Insist on Undo” (optional: after 2–3 insists, allow one undo OR still refuse in a funny way)
+
+Keep this deterministic for demo:
+- First click: life advice popup always triggers.
+- Make behavior configurable via config file.
+
+========================================================
+E) CONFIG + DEMO POLISH (IMPORTANT)
+========================================================
+Ensure everything is tunable from the existing config file (e.g. src/config/chaosConfig.ts):
+- suggestion cadence in phase 1
+- rejections before chaos
+- max bosses on screen
+- max boss bubbles
+- popup cooldowns
+- sabotage frequency (if sabotage remains; keep it mild and essay-themed)
+
+Update README:
+- “How to demo”
+  1) Type a sentence → get clean Grammarly-ish useless critique
+  2) Reject a few → morale boosts
+  3) Enter chaos → ONE boss appears, time-gaslight happens occasionally, not constant
+  4) Click Undo → life advice popup
+
+========================================================
+ACCEPTANCE CHECKLIST
+========================================================
+- UI reads as an ESSAY editor, not code.
+- Suggestions are essay-critique only, no coding references.
+- Phase 1 looks clean/professional.
+- Chaos mode is not a flood: max 1 boss + max 1 boss bubble on screen.
+- Undo button triggers life-advice popup (clean + funny).
+- Demo feels controlled and presentable.
+
+Proceed by:
+1) Updating content + labels to essay-only
+2) Adjusting UI styling to “Grammarly clean”
+3) Implementing boss caps and cooldowns
+4) Implementing Undo life-advice modal
+5) Updating config + README demo steps
