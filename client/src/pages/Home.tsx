@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useChaosMachine } from "@/hooks/useChaosMachine";
 import { Editor } from "@/components/Editor";
 import { SuggestionBubble } from "@/components/SuggestionBubble";
@@ -38,6 +38,10 @@ export default function Home() {
       setHasTransitioned(true);
     }
   }, [phase, hasTransitioned]);
+
+  const handleTransitionComplete = useCallback(() => {
+    setShowTransition(false);
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -153,7 +157,7 @@ export default function Home() {
         {/* Transition Sequence */}
         <AnimatePresence>
           {showTransition && (
-            <TransitionSequence onComplete={() => setShowTransition(false)} />
+            <TransitionSequence onComplete={handleTransitionComplete} />
           )}
         </AnimatePresence>
 
