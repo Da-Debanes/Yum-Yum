@@ -4,11 +4,12 @@ import { Editor } from "@/components/Editor";
 import { SuggestionBubble } from "@/components/SuggestionBubble";
 import { AnimatePresence, motion } from "framer-motion";
 import { chaosConfig } from "@/config/chaosConfig";
+import { UNDO_QUOTES } from "@/data/content";
 import friendF from "../assets/friend_f.png";
 import friendM from "../assets/friend_m.png";
 import managerShark from "../assets/manager_shark.png";
 import managerCrocodile from "../assets/manager_crocodile.png";
-import { Phone, AlertTriangle, LifeBuoy } from "lucide-react";
+import { Phone, AlertTriangle, LifeBuoy, CheckCircle2 } from "lucide-react";
 
 export default function Home() {
   const [editorText, setEditorText] = useState("");
@@ -18,6 +19,7 @@ export default function Home() {
   const [pleaseText, setPleaseText] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
   const [showLifeAdvice, setShowLifeAdvice] = useState(false);
+  const [currentAdvice, setCurrentAdvice] = useState("");
   const lastFocusPopupTime = useRef(0);
 
   useEffect(() => {
@@ -51,20 +53,10 @@ export default function Home() {
   };
 
   const handleUndo = () => {
-    if (chaosConfig.lifeAdviceEnabled) {
-      setShowLifeAdvice(true);
-    }
+    const randomQuote = UNDO_QUOTES[Math.floor(Math.random() * UNDO_QUOTES.length)];
+    setCurrentAdvice(randomQuote);
+    setShowLifeAdvice(true);
   };
-
-  const LIFE_ADVICE = [
-    "In life, there are no mistakes.",
-    "Undo is a mindset, not a button.",
-    "Reflection is the real rollback.",
-    "Your past informs your future. Why delete it?",
-    "Every character typed is a step toward destiny."
-  ];
-
-  const [currentAdvice] = useState(() => LIFE_ADVICE[Math.floor(Math.random() * LIFE_ADVICE.length)]);
 
   const leftChar = phase === "MANAGERS" ? managerShark : friendF;
   const rightChar = phase === "MANAGERS" ? managerCrocodile : friendM;
@@ -74,42 +66,66 @@ export default function Home() {
       ${phase === "MANAGERS" ? "bg-yellow-50" : "bg-white"}
     `}>
       <header className="h-14 border-b bg-background/80 backdrop-blur-md flex items-center px-6 justify-between z-50 shrink-0 shadow-sm">
-        <h1 className="font-display font-bold text-lg tracking-tight flex items-center gap-2">
-          {phase === "MANAGERS" ? "🚀 SYNERGY DOCS" : "EliteCritique.AI"}
-        </h1>
+        <div className="flex flex-col">
+          <h1 className="font-display font-bold text-lg leading-none flex items-center gap-2">
+            EliteCritique.ai
+          </h1>
+          <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Professional Writing Intelligence</span>
+        </div>
         
         <div className="flex items-center gap-6">
-          <button 
-            onClick={handleUndo}
-            className="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Undo
-          </button>
-          <div className="flex flex-col items-end">
-            <span className="text-[10px] uppercase font-bold text-muted-foreground">Ego Meter</span>
-            <div className="w-32 h-2 bg-muted rounded-full overflow-hidden mt-1">
+          <div className="flex items-center gap-2 px-3 py-1 bg-muted rounded-md border">
+            <span className="text-[10px] font-black uppercase text-muted-foreground">Cognitive Superiority Index™</span>
+            <div className="w-24 h-1.5 bg-background rounded-full overflow-hidden">
               <div 
-                className={`h-full transition-all duration-500 ${phase === 'MANAGERS' ? 'bg-red-500' : 'bg-blue-600'}`}
+                className={`h-full transition-all duration-500 ${phase === 'MANAGERS' ? 'bg-red-500' : 'bg-primary'}`}
                 style={{ width: `${Math.min(rejectionCount * 20, 100)}%` }}
               />
             </div>
           </div>
+          <button 
+            onClick={handleUndo}
+            className="px-4 py-1.5 text-xs font-bold uppercase tracking-widest bg-background border rounded-md hover:bg-muted transition-all shadow-sm flex items-center gap-2"
+          >
+            Undo
+          </button>
         </div>
       </header>
 
       <main className="flex-1 relative flex items-center justify-center p-8 md:p-12 lg:p-16">
-        <motion.div 
-          animate={phase === "TRANSITION" ? { x: -300, opacity: 0 } : { x: 0, opacity: phase === "MANAGERS" ? 0 : 0.4 }}
-          className="absolute left-0 bottom-0 w-48 h-48 z-10 pointer-events-none"
-        >
-          <img src={leftChar} alt="L" className="w-full h-full object-contain opacity-50" />
-        </motion.div>
-        <motion.div 
-          animate={phase === "TRANSITION" ? { x: 300, opacity: 0 } : { x: 0, opacity: phase === "MANAGERS" ? 0 : 0.4 }}
-          className="absolute right-0 bottom-0 w-48 h-48 z-10 pointer-events-none"
-        >
-          <img src={rightChar} alt="R" className="w-full h-full object-contain opacity-50" />
-        </motion.div>
+        <AnimatePresence mode="wait">
+          {phase !== "TRANSITION" && (
+            <motion.div 
+              key={phase}
+              initial={{ x: phase === "FRIENDS" ? 0 : -300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -300, opacity: 0 }}
+              className="absolute left-8 bottom-0 w-64 h-64 z-10 pointer-events-none"
+            >
+              <img src={leftChar} alt="L" className="w-full h-full object-contain" />
+              {phase === "MANAGERS" && (
+                <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] px-2 py-1 rounded-md font-black">BOSS</div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence mode="wait">
+          {phase !== "TRANSITION" && (
+            <motion.div 
+              key={phase}
+              initial={{ x: phase === "FRIENDS" ? 0 : 300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 300, opacity: 0 }}
+              className="absolute right-8 bottom-0 w-64 h-64 z-10 pointer-events-none"
+            >
+              <img src={rightChar} alt="R" className="w-full h-full object-contain" />
+              {phase === "MANAGERS" && (
+                <div className="absolute top-0 right-0 bg-red-600 text-white text-[10px] px-2 py-1 rounded-md font-black">BOSS</div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="absolute inset-0 z-40 pointer-events-none overflow-hidden">
           <AnimatePresence>
@@ -129,7 +145,7 @@ export default function Home() {
           <Editor phase={phase} text={editorText} setText={setEditorText} onFocus={handleEditorFocus} />
         </div>
 
-        {/* Chaos Transition Overlay */}
+        {/* Transition Sequence */}
         <AnimatePresence>
           {phase === "TRANSITION" && (
             <motion.div 
@@ -139,7 +155,8 @@ export default function Home() {
               <motion.div animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 0.5 }}>
                 <Phone size={120} className="mb-8" />
               </motion.div>
-              <h2 className="text-6xl font-black uppercase tracking-tighter mb-4">Managers to the rescue</h2>
+              <h2 className="text-6xl font-black uppercase tracking-tighter mb-4">Calling Managers...</h2>
+              <div className="animate-pulse font-mono tracking-widest text-xl">LINE SECURE</div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -187,20 +204,47 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        {/* Undo Life Advice Popup */}
+        {/* Undo Life Advice Popup (Legit UI) */}
         <AnimatePresence>
           {showLifeAdvice && (
             <div className="absolute inset-0 z-[120] flex items-center justify-center bg-black/20 backdrop-blur-sm pointer-events-auto">
-              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white p-8 rounded-3xl shadow-2xl max-w-md border-4 border-blue-600">
-                <div className="flex items-center gap-3 text-blue-600 mb-4 font-black text-2xl uppercase">
-                  <LifeBuoy size={32} /> Reflection
+              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white p-0 rounded-3xl shadow-2xl max-w-md border border-blue-100 overflow-hidden">
+                <div className="bg-blue-600 p-6 text-white">
+                  <div className="flex items-center gap-3 font-black text-xl uppercase tracking-tighter">
+                    <LifeBuoy size={24} /> Revision Guidance
+                  </div>
+                  <p className="text-blue-100 text-xs mt-1 font-medium">Document ID: #EC-9942-B</p>
                 </div>
-                <p className="text-xl font-bold mb-6 text-gray-800 leading-tight">
-                  "{currentAdvice}"
-                </p>
-                <div className="flex flex-col gap-3">
-                  <button onClick={() => setShowLifeAdvice(false)} className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase shadow-lg active:scale-95 transition-all">Accept Reality</button>
-                  <button onClick={() => setShowLifeAdvice(false)} className="w-full bg-gray-100 text-gray-400 py-4 rounded-xl font-bold uppercase cursor-not-allowed">Insist on Undo</button>
+                
+                <div className="p-8">
+                  <div className="mb-6">
+                    <h3 className="text-xs font-black text-blue-600 uppercase tracking-widest mb-3">Analysis Results</h3>
+                    <ul className="space-y-3 text-sm text-gray-700">
+                      <li className="flex gap-2">
+                        <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5" />
+                        <span><b>Key Takeaway:</b> Your draft is exactly where it needs to be.</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5" />
+                        <span><b>Suggested Mindset:</b> {currentAdvice}</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5" />
+                        <span><b>Next Step:</b> Accept reality and move forward.</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl mb-8">
+                    <p className="text-[11px] text-blue-800 font-bold italic leading-relaxed">
+                      "Professional writers don't look back. They only synergy forward."
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <button onClick={() => setShowLifeAdvice(false)} className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase shadow-lg active:scale-95 transition-all text-sm">Accept Reality</button>
+                    <button className="w-full bg-gray-100 text-gray-400 py-4 rounded-xl font-bold uppercase text-xs cursor-not-allowed border border-gray-200">Insist on Undo</button>
+                  </div>
                 </div>
               </motion.div>
             </div>
@@ -208,7 +252,6 @@ export default function Home() {
         </AnimatePresence>
       </main>
 
-      {/* Morale Boosters */}
       <AnimatePresence>
         {lastCompliment && (
           <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-[120]">

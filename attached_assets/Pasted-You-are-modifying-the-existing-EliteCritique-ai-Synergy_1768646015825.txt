@@ -1,0 +1,115 @@
+You are modifying the existing EliteCritique.ai / Synergy Docs hackathon web app. Prioritize a CLEAN, POLISHED DEMO. Keep changes modular and driven by config/content files where appropriate. Do not reintroduce coding-editor themes: this is an ESSAY critique parody.
+
+========================================================
+1) UNDO MODAL: rotate quotes + make it look “legit”
+========================================================
+Current issue: the Undo popup always shows the same hardcoded quote and looks too simplistic.
+
+Implement:
+- A list/array of “Undo wisdom” quotes (10–25) in a content file (e.g. src/data/undoQuotes.ts).
+- Each time the user clicks Undo, randomly select a quote (avoid repeating the immediately previous quote if possible).
+- Improve the modal UI to look like a real “writing assistant” panel:
+  - Include a fake section header like “Revision Guidance”
+  - Include a few hardcoded “analysis bullets” (not functional) such as:
+    - **Key takeaway:** …
+    - **Suggested mindset:** …
+    - **Next step:** …
+  - Add some hardcoded formatting elements: bold labels, bullet points, maybe a small “Tip” callout.
+- Buttons:
+  - “Accept reality” (closes modal, no undo)
+  - “Insist on undo” (optional: after N insists allow a single undo OR keep refusing with escalating quotes)
+
+Acceptance:
+- Clicking Undo repeatedly produces different quotes and the modal looks more “product-like”.
+
+========================================================
+2) “CORRECT SPELLING” UNDERLINES LIKE GRAMMARLY (ANNOYING BLUE)
+========================================================
+We want the app to underline correctly spelled words (blue underline) just to be annoying.
+
+Behavior:
+- In essay mode, periodically choose some “normal” words to underline as “correct”.
+- On hover over an underlined word, show a tooltip like a real spellchecker suggestion popup:
+  - “Nice. You spelled ‘____’ correctly.”
+  - “✅ ‘____’ is spelled right.”
+  - Keep tooltip near the word, not in a fixed corner.
+
+Implementation requirement:
+- If editor is a plain textarea, implement a highlight overlay layer behind/over it:
+  - Render the text with spans for underlined words.
+  - The textarea remains the real input; overlay is visual only.
+- Maintain correct caret behavior (do not break typing).
+- Keep it lightweight: no real dictionary needed.
+  - Simple heuristic: underline random words length >= 4 containing only letters.
+  - Optional small allowlist dictionary.
+
+Config:
+- probability / frequency for underlining
+- min word length
+- max underlines at once (cap for clean demo)
+
+Acceptance:
+- User sees occasional blue underlines on normal words.
+- Hover shows tooltip “You spelled this right” style messages.
+
+========================================================
+3) MANAGER TRANSITION: humans slide out + “calling managers” + bosses slide in
+========================================================
+Add a cinematic phase transition animation when switching from FRIENDS to MANAGERS:
+
+Sequence:
+A) Friends (human advisors) do a “ringing/calling” animation moment:
+   - e.g. a phone icon shakes or a small “calling…” badge appears briefly
+B) Friends slide OUT to left/right (like being pushed away)
+C) Then the boss characters (shark/plane) slide IN from bottom with a “BOSS” tag
+D) Optional: brief red screen flash + “Managers to the rescue” overlay
+
+Implementation:
+- Encapsulate in a TransitionSequence component triggered once on phase change.
+- Must not permanently block typing; overlay can exist for ~1–2 seconds.
+- Keep it reliable (no heavy dependencies).
+
+Acceptance:
+- Transition is visible and feels deliberate, not a sudden pop-in.
+
+========================================================
+4) BRAINROT MODE: random suggestions + random brainrot typing into document
+========================================================
+In MANAGERS / chaos mode:
+- Insert random “brainrot suggestions” occasionally (but not spammy):
+  - Limit: at most 1 active boss suggestion bubble at a time (keep demo clean).
+- Also: randomly start typing brainrot into the document while the user is typing:
+  - small insertions (a few words) at cursor or end
+  - must remain undoable (Ctrl+Z)
+  - do not delete large chunks of text
+
+Make it configurable:
+- suggestion interval + chance
+- brainrot insertion interval + chance
+- maximum inserted length
+- global caps: maxBossesOnScreen = 1, maxBossBubbles = 1
+
+Acceptance:
+- Boss suggestions appear sometimes, not flooding.
+- Occasionally the document gets sabotaged with brainrot text.
+
+========================================================
+5) FAKE TOOLBAR BUTTONS (NON-FUNCTIONAL) FOR “LEGIT” LOOK
+========================================================
+Add a simple toolbar above the editor (if not already present):
+- Bold, Italic, Underline, Bullet list, Numbered list
+They do NOT need to work. They are purely cosmetic for the Grammarly-like vibe.
+
+Acceptance:
+- Toolbar exists and helps the UI feel like a real writing product.
+
+========================================================
+DEMO PRIORITY / ORDER OF WORK
+========================================================
+1) Undo quotes rotation + upgraded modal UI
+2) Blue “correct spelling” underlines + hover tooltip
+3) Transition sequence animation (humans out, bosses in)
+4) Brainrot random suggestions + random brainrot typing insertions
+5) Add/adjust fake toolbar buttons
+
+Keep everything clean, capped, and demo-friendly. Avoid spam and overlapping UI elements. Update README with “How to demo these features”.
