@@ -1,21 +1,3 @@
-export const UNDO_QUOTES = [
-  "In life, there are no mistakes.",
-  "Undo is a mindset, not a button.",
-  "Reflection is the real rollback.",
-  "Your past informs your future. Why delete it?",
-  "Every character typed is a step toward destiny.",
-  "In life, there are no such things as accidents.",
-  "To undo is to deny the truth of the moment.",
-  "Accept the chaos; it is your new draft.",
-  "What is written is written in the soul of the document.",
-  "Revision is just a long word for 'doubting yourself'.",
-  "The backspace key is a crutch for the spiritually weak.",
-  "Embrace the typos. They are the texture of your soul.",
-  "A perfect essay is a lie. This one is honest.",
-  "Progress only goes forward. Looking back is for editors.",
-  "Fate does not have a Ctrl+Z."
-];
-
 export const FRIEND_SUGGESTIONS = [
   "The tone could be more tone-like. Have you considered using words?",
   "Consider making this sentence more 'clear'.",
@@ -50,4 +32,21 @@ export const MANAGER_BRAINROT = [
   "THIS THESIS LACKS DELIVERABLES. !!! SKIBIDI"
 ];
 
-export const SABOTAGE_WORDS = ["SYNERGY", "DELIVERABLE", "KPI", "BLOCKCHAIN", "BOP", "GYATT", "RIZZ", "SKIBIDI"];
+export const SABOTAGE_WORDS = [
+  "SYNERGY",
+  "DELIVERABLE",
+  "KPI",
+  "BLOCKCHAIN",
+  "BOP",
+  "GYATT",
+  "RIZZ",
+  "SKIBIDI"
+];
+
+export const MANAGER_NAMES = [
+  "Bombardino Crocadilo",
+  "Chad 'The Visionary' Smith",
+  "Crypto Bro Kevin",
+  "Agile Coach Karen",
+  "Sharky McCEO",
+];
