@@ -1,7 +1,7 @@
 export const chaosConfig = {
   // Friends Phase
   typingDebounce: 500, // ms after typing stops before friends suggest
-  friendSuggestionInterval: 6000, // ms between suggestions
+  friendSuggestionInterval: 3000, // ms between suggestions
   rejectionsToManagers: 5, // number of rejections before switching
   
   // Managers Phase
