@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { useChaosMachine } from "@/hooks/useChaosMachine";
 import { Editor } from "@/components/Editor";
 import { SuggestionBubble } from "@/components/SuggestionBubble";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import friendF from "../assets/friend_f.png";
+import friendM from "../assets/friend_m.png";
+import managerShark from "../assets/manager_shark.png";
+import managerCrocodile from "../assets/manager_crocodile.png";
 
 export default function Home() {
   const [editorText, setEditorText] = useState("// Start typing your brilliant code/essay here...");
@@ -15,6 +19,9 @@ export default function Home() {
       document.body.classList.remove("manager-mode");
     }
   }, [phase]);
+
+  const leftChar = phase === "MANAGERS" ? managerShark : friendF;
+  const rightChar = phase === "MANAGERS" ? managerCrocodile : friendM;
 
   return (
     <div className={`w-full h-screen overflow-hidden flex flex-col relative transition-colors duration-500
@@ -43,46 +50,46 @@ export default function Home() {
       </header>
 
       <main className="flex-1 relative flex items-center justify-center p-8 md:p-12 lg:p-16">
-        {/* Left Character Area */}
-        <div className="absolute left-4 bottom-4 w-64 h-64 z-20 pointer-events-none flex flex-col items-center justify-end">
+        {/* Tucked Characters */}
+        <div className="absolute left-0 bottom-0 w-48 h-48 z-10 opacity-40 pointer-events-none">
+          <img src={leftChar} alt="L" className="w-full h-full object-contain" />
+        </div>
+        <div className="absolute right-0 bottom-0 w-48 h-48 z-10 opacity-40 pointer-events-none">
+          <img src={rightChar} alt="R" className="w-full h-full object-contain" />
+        </div>
+
+        {/* Suggestion Popups */}
+        <div className="absolute inset-0 z-20 pointer-events-none">
           <AnimatePresence>
-            {suggestions.filter(s => s.side === "LEFT").map(s => (
+            {suggestions.map(s => (
               <SuggestionBubble 
                 key={s.id} 
                 suggestion={s} 
                 onReject={rejectSuggestion} 
                 onAccept={acceptSuggestion}
+                isLeft={s.side === "LEFT"}
               />
             ))}
           </AnimatePresence>
         </div>
 
         {/* Central Editor */}
-        <div className="w-full max-w-4xl h-full max-h-[80vh] z-10">
+        <div className="w-full max-w-4xl h-full max-h-[80vh] z-15 relative">
           <Editor phase={phase} text={editorText} setText={setEditorText} />
-        </div>
-
-        {/* Right Character Area */}
-        <div className="absolute right-4 bottom-4 w-64 h-64 z-20 pointer-events-none flex flex-col items-center justify-end">
-          <AnimatePresence>
-            {suggestions.filter(s => s.side === "RIGHT").map(s => (
-              <SuggestionBubble 
-                key={s.id} 
-                suggestion={s} 
-                onReject={rejectSuggestion} 
-                onAccept={acceptSuggestion}
-              />
-            ))}
-          </AnimatePresence>
         </div>
       </main>
 
       <AnimatePresence>
         {lastCompliment && (
           <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-50">
-            <div className="bg-foreground text-background px-6 py-3 rounded-full shadow-2xl font-medium">
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+              className="bg-foreground text-background px-6 py-3 rounded-full shadow-2xl font-medium"
+            >
               {lastCompliment}
-            </div>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>
