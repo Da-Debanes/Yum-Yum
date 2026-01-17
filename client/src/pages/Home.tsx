@@ -9,7 +9,7 @@ import managerShark from "../assets/manager_shark.png";
 import managerCrocodile from "../assets/manager_crocodile.png";
 
 export default function Home() {
-  const [editorText, setEditorText] = useState("// Start typing your brilliant code/essay here...");
+  const [editorText, setEditorText] = useState("");
   const { phase, rejectionCount, suggestions, lastCompliment, rejectSuggestion, acceptSuggestion } = useChaosMachine(editorText);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function Home() {
     <div className={`w-full h-screen overflow-hidden flex flex-col relative transition-colors duration-500
       ${phase === "MANAGERS" ? "bg-yellow-50" : "bg-blue-50/30"}
     `}>
-      <header className="h-14 border-b bg-background/80 backdrop-blur-md flex items-center px-6 justify-between z-30 shrink-0">
+      <header className="h-14 border-b bg-background/80 backdrop-blur-md flex items-center px-6 justify-between z-30 shrink-0 shadow-sm">
         <h1 className="font-display font-bold text-lg tracking-tight flex items-center gap-2">
           {phase === "MANAGERS" ? "🚀 10X SYNERGY STUDIO" : "CodeEditor Pro"}
         </h1>
@@ -51,10 +51,10 @@ export default function Home() {
 
       <main className="flex-1 relative flex items-center justify-center p-8 md:p-12 lg:p-16">
         {/* Tucked Characters */}
-        <div className="absolute left-0 bottom-0 w-48 h-48 z-10 opacity-40 pointer-events-none">
+        <div className="absolute left-0 bottom-0 w-48 h-48 z-10 opacity-40 pointer-events-none transition-opacity duration-700">
           <img src={leftChar} alt="L" className="w-full h-full object-contain" />
         </div>
-        <div className="absolute right-0 bottom-0 w-48 h-48 z-10 opacity-40 pointer-events-none">
+        <div className="absolute right-0 bottom-0 w-48 h-48 z-10 opacity-40 pointer-events-none transition-opacity duration-700">
           <img src={rightChar} alt="R" className="w-full h-full object-contain" />
         </div>
 
@@ -74,7 +74,7 @@ export default function Home() {
         </div>
 
         {/* Central Editor */}
-        <div className="w-full max-w-4xl h-full max-h-[80vh] z-15 relative">
+        <div className="w-full max-w-5xl h-full max-h-[85vh] z-15 relative">
           <Editor phase={phase} text={editorText} setText={setEditorText} />
         </div>
       </main>
