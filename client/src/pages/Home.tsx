@@ -25,7 +25,7 @@ export default function Home() {
   const lastFocusPopupTime = useRef(0);
   const lastAdviceIndex = useRef(0);
 
-  const [hasTransitioned, setHasTransitioned] = useState(false);
+  const hasTransitionedRef = useRef(false);
 
   useEffect(() => {
     if (phase === "MANAGERS") document.body.classList.add("manager-mode");
@@ -33,11 +33,11 @@ export default function Home() {
   }, [phase]);
 
   useEffect(() => {
-    if (phase === "TRANSITION" && !hasTransitioned) {
+    if (phase === "TRANSITION" && !hasTransitionedRef.current) {
+      hasTransitionedRef.current = true;
       setShowTransition(true);
-      setHasTransitioned(true);
     }
-  }, [phase, hasTransitioned]);
+  }, [phase]);
 
   const handleTransitionComplete = useCallback(() => {
     setShowTransition(false);
