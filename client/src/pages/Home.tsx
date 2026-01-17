@@ -289,9 +289,16 @@ function TransitionSequence({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState<'FLASH' | 'CALLING' | 'SLIDE' | 'NONE'>('FLASH');
 
   useEffect(() => {
-    const flashTimer = setTimeout(() => setStep('CALLING'), chaosConfig.transitionFlashDuration || 800);
-    const callingTimer = setTimeout(() => setStep('SLIDE'), (chaosConfig.transitionFlashDuration || 800) + (chaosConfig.transitionCallingDuration || 500));
-    const slideTimer = setTimeout(() => onComplete(), (chaosConfig.transitionFlashDuration || 800) + (chaosConfig.transitionCallingDuration || 500) + (chaosConfig.transitionSlideDuration || 1000));
+    const flashDuration = chaosConfig.transitionFlashDuration || 800;
+    const callingDuration = chaosConfig.transitionCallingDuration || 500;
+    const slideDuration = chaosConfig.transitionSlideDuration || 1000;
+
+    const flashTimer = setTimeout(() => setStep('CALLING'), flashDuration);
+    const callingTimer = setTimeout(() => setStep('SLIDE'), flashDuration + callingDuration);
+    const slideTimer = setTimeout(() => {
+      setStep('NONE');
+      onComplete();
+    }, flashDuration + callingDuration + slideDuration);
 
     return () => {
       clearTimeout(flashTimer);
@@ -305,10 +312,11 @@ function TransitionSequence({ onComplete }: { onComplete: () => void }) {
       <AnimatePresence>
         {step === 'FLASH' && (
           <motion.div 
+            key="flash"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-red-600 flex flex-col items-center justify-center text-white p-12"
+            className="absolute inset-0 bg-red-600 flex flex-col items-center justify-center text-white p-12 pointer-events-auto"
           >
             <motion.div 
               animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
@@ -325,14 +333,16 @@ function TransitionSequence({ onComplete }: { onComplete: () => void }) {
 
         {step === 'CALLING' && (
           <motion.div 
+            key="calling"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-3xl shadow-2xl border-4 border-red-500 flex flex-col items-center gap-4"
+            exit={{ scale: 0.8, opacity: 0 }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-3xl shadow-2xl border-4 border-red-500 flex flex-col items-center gap-4 pointer-events-auto"
           >
             <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ repeat: Infinity, duration: 0.1 }}>
               <Phone size={64} className="text-red-600" />
             </motion.div>
-            <span className="font-black uppercase tracking-widest text-red-600 animate-pulse text-xl">Calling Managers...</span>
+            <span className="font-black uppercase tracking-widest text-red-600 animate-pulse text-xl text-center">Calling Managers...</span>
           </motion.div>
         )}
       </AnimatePresence>
