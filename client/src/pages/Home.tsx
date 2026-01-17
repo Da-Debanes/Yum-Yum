@@ -8,7 +8,8 @@ import friendF from "../assets/friend_f.png";
 import friendM from "../assets/friend_m.png";
 import managerShark from "../assets/manager_shark.png";
 import managerCrocodile from "../assets/manager_crocodile.png";
-import { Phone, AlertTriangle, LifeBuoy } from "lucide-react";
+import { Phone, AlertTriangle, LifeBuoy, CheckCircle2, Lightbulb, ArrowRight } from "lucide-react";
+import { UNDO_QUOTES } from "@/data/undoQuotes";
 
 export default function Home() {
   const [editorText, setEditorText] = useState("");
@@ -18,11 +19,20 @@ export default function Home() {
   const [pleaseText, setPleaseText] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
   const [showLifeAdvice, setShowLifeAdvice] = useState(false);
+  const [currentAdvice, setCurrentAdvice] = useState(UNDO_QUOTES[0]);
+  const [showTransition, setShowTransition] = useState(false);
   const lastFocusPopupTime = useRef(0);
+  const lastAdviceIndex = useRef(0);
 
   useEffect(() => {
     if (phase === "MANAGERS") document.body.classList.add("manager-mode");
     else document.body.classList.remove("manager-mode");
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase === "TRANSITION") {
+      setShowTransition(true);
+    }
   }, [phase]);
 
   useEffect(() => {
@@ -35,7 +45,7 @@ export default function Home() {
   const handleEditorFocus = () => {
     if (phase !== "MANAGERS" || !chaosConfig.enableFocusGaslighting) return;
     const now = Date.now();
-    if (now - lastFocusPopupTime.current < chaosConfig.chaosPopupCooldown) return;
+    if (now - lastFocusPopupTime.current < (chaosConfig.chaosPopupCooldown || 30000)) return;
     lastFocusPopupTime.current = now;
     setGaslightStep(1);
     setShowGaslight(true);
@@ -51,20 +61,15 @@ export default function Home() {
   };
 
   const handleUndo = () => {
-    if (chaosConfig.lifeAdviceEnabled) {
-      setShowLifeAdvice(true);
-    }
+    let nextIndex;
+    do {
+      nextIndex = Math.floor(Math.random() * UNDO_QUOTES.length);
+    } while (nextIndex === lastAdviceIndex.current && UNDO_QUOTES.length > 1);
+    
+    lastAdviceIndex.current = nextIndex;
+    setCurrentAdvice(UNDO_QUOTES[nextIndex]);
+    setShowLifeAdvice(true);
   };
-
-  const LIFE_ADVICE = [
-    "In life, there are no mistakes.",
-    "Undo is a mindset, not a button.",
-    "Reflection is the real rollback.",
-    "Your past informs your future. Why delete it?",
-    "Every character typed is a step toward destiny."
-  ];
-
-  const [currentAdvice] = useState(() => LIFE_ADVICE[Math.floor(Math.random() * LIFE_ADVICE.length)]);
 
   const leftChar = phase === "MANAGERS" ? managerShark : friendF;
   const rightChar = phase === "MANAGERS" ? managerCrocodile : friendM;
@@ -98,18 +103,30 @@ export default function Home() {
       </header>
 
       <main className="flex-1 relative flex items-center justify-center p-8 md:p-12 lg:p-16">
-        <motion.div 
-          animate={phase === "TRANSITION" ? { x: -300, opacity: 0 } : { x: 0, opacity: phase === "MANAGERS" ? 0 : 0.4 }}
-          className="absolute left-0 bottom-0 w-48 h-48 z-10 pointer-events-none"
-        >
-          <img src={leftChar} alt="L" className="w-full h-full object-contain opacity-50" />
-        </motion.div>
-        <motion.div 
-          animate={phase === "TRANSITION" ? { x: 300, opacity: 0 } : { x: 0, opacity: phase === "MANAGERS" ? 0 : 0.4 }}
-          className="absolute right-0 bottom-0 w-48 h-48 z-10 pointer-events-none"
-        >
-          <img src={rightChar} alt="R" className="w-full h-full object-contain opacity-50" />
-        </motion.div>
+        <AnimatePresence>
+          {phase !== "TRANSITION" && (
+            <>
+              <motion.div 
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ x: 0, opacity: phase === "MANAGERS" ? 0.7 : 0.4 }}
+                exit={{ x: -300, opacity: 0 }}
+                transition={{ duration: 1 }}
+                className="absolute left-0 bottom-0 w-48 h-48 z-10 pointer-events-none"
+              >
+                <img src={leftChar} alt="L" className="w-full h-full object-contain" />
+              </motion.div>
+              <motion.div 
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: phase === "MANAGERS" ? 0.7 : 0.4 }}
+                exit={{ x: 300, opacity: 0 }}
+                transition={{ duration: 1 }}
+                className="absolute right-0 bottom-0 w-48 h-48 z-10 pointer-events-none"
+              >
+                <img src={rightChar} alt="R" className="w-full h-full object-contain" />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         <div className="absolute inset-0 z-40 pointer-events-none overflow-hidden">
           <AnimatePresence>
@@ -129,18 +146,10 @@ export default function Home() {
           <Editor phase={phase} text={editorText} setText={setEditorText} onFocus={handleEditorFocus} />
         </div>
 
-        {/* Chaos Transition Overlay */}
+        {/* Transition Sequence */}
         <AnimatePresence>
-          {phase === "TRANSITION" && (
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 z-[100] bg-red-600 flex flex-col items-center justify-center text-white text-center"
-            >
-              <motion.div animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 0.5 }}>
-                <Phone size={120} className="mb-8" />
-              </motion.div>
-              <h2 className="text-6xl font-black uppercase tracking-tighter mb-4">Managers to the rescue</h2>
-            </motion.div>
+          {showTransition && (
+            <TransitionSequence onComplete={() => setShowTransition(false)} />
           )}
         </AnimatePresence>
 
@@ -187,20 +196,71 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        {/* Undo Life Advice Popup */}
+        {/* Upgraded Undo Life Advice Popup */}
         <AnimatePresence>
           {showLifeAdvice && (
-            <div className="absolute inset-0 z-[120] flex items-center justify-center bg-black/20 backdrop-blur-sm pointer-events-auto">
-              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white p-8 rounded-3xl shadow-2xl max-w-md border-4 border-blue-600">
-                <div className="flex items-center gap-3 text-blue-600 mb-4 font-black text-2xl uppercase">
-                  <LifeBuoy size={32} /> Reflection
+            <div className="absolute inset-0 z-[120] flex items-center justify-center bg-black/40 backdrop-blur-sm pointer-events-auto">
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0, y: 20 }} 
+                animate={{ scale: 1, opacity: 1, y: 0 }} 
+                className="bg-white p-0 rounded-2xl shadow-2xl max-w-md w-full border border-border overflow-hidden"
+              >
+                <div className="bg-blue-600 px-6 py-4 text-white flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <LifeBuoy size={20} />
+                    <span className="font-black text-sm uppercase tracking-widest">Revision Guidance</span>
+                  </div>
                 </div>
-                <p className="text-xl font-bold mb-6 text-gray-800 leading-tight">
-                  "{currentAdvice}"
-                </p>
-                <div className="flex flex-col gap-3">
-                  <button onClick={() => setShowLifeAdvice(false)} className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase shadow-lg active:scale-95 transition-all">Accept Reality</button>
-                  <button onClick={() => setShowLifeAdvice(false)} className="w-full bg-gray-100 text-gray-400 py-4 rounded-xl font-bold uppercase cursor-not-allowed">Insist on Undo</button>
+
+                <div className="p-8">
+                  <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                    <p className="text-lg font-bold text-blue-900 leading-tight italic">
+                      "{currentAdvice.quote}"
+                    </p>
+                  </div>
+
+                  <div className="space-y-4 mb-8">
+                    <div className="flex gap-3">
+                      <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[10px] font-black uppercase text-gray-400 mb-0.5">Key Takeaway</p>
+                        <p className="text-sm font-bold text-gray-700">{currentAdvice.takeaway}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <Lightbulb size={16} className="text-yellow-500 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[10px] font-black uppercase text-gray-400 mb-0.5">Suggested Mindset</p>
+                        <p className="text-sm font-bold text-gray-700">{currentAdvice.mindset}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <ArrowRight size={16} className="text-blue-500 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[10px] font-black uppercase text-gray-400 mb-0.5">Next Step</p>
+                        <p className="text-sm font-bold text-gray-700">{currentAdvice.nextStep}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <button 
+                      onClick={() => setShowLifeAdvice(false)} 
+                      className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg active:scale-95 transition-all"
+                    >
+                      Accept Reality
+                    </button>
+                    <button 
+                      onClick={() => setShowLifeAdvice(false)} 
+                      className="w-full bg-gray-50 text-gray-400 py-3.5 rounded-xl font-bold uppercase text-[10px] tracking-widest cursor-not-allowed border border-gray-100"
+                    >
+                      Insist on Undo
+                    </button>
+                  </div>
+
+                  <p className="mt-4 text-center text-[9px] font-bold text-gray-300 italic uppercase">
+                    Tip: Every revision is a chance to lose your original voice.
+                  </p>
                 </div>
               </motion.div>
             </div>
@@ -219,6 +279,61 @@ export default function Home() {
               {lastCompliment}
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function TransitionSequence({ onComplete }: { onComplete: () => void }) {
+  const [step, setStep] = useState<'FLASH' | 'CALLING' | 'SLIDE' | 'NONE'>('FLASH');
+
+  useEffect(() => {
+    const flashTimer = setTimeout(() => setStep('CALLING'), chaosConfig.transitionFlashDuration || 800);
+    const callingTimer = setTimeout(() => setStep('SLIDE'), (chaosConfig.transitionFlashDuration || 800) + (chaosConfig.transitionCallingDuration || 500));
+    const slideTimer = setTimeout(() => onComplete(), (chaosConfig.transitionFlashDuration || 800) + (chaosConfig.transitionCallingDuration || 500) + (chaosConfig.transitionSlideDuration || 1000));
+
+    return () => {
+      clearTimeout(flashTimer);
+      clearTimeout(callingTimer);
+      clearTimeout(slideTimer);
+    };
+  }, [onComplete]);
+
+  return (
+    <div className="fixed inset-0 z-[1000] pointer-events-none">
+      <AnimatePresence>
+        {step === 'FLASH' && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-red-600 flex flex-col items-center justify-center text-white p-12"
+          >
+            <motion.div 
+              animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 0.2 }}
+              className="flex flex-col items-center"
+            >
+              <AlertTriangle size={120} className="mb-6" />
+              <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter text-center leading-none">
+                MANAGERS<br/>TO THE RESCUE
+              </h2>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {step === 'CALLING' && (
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-3xl shadow-2xl border-4 border-red-500 flex flex-col items-center gap-4"
+          >
+            <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ repeat: Infinity, duration: 0.1 }}>
+              <Phone size={64} className="text-red-600" />
+            </motion.div>
+            <span className="font-black uppercase tracking-widest text-red-600 animate-pulse text-xl">Calling Managers...</span>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

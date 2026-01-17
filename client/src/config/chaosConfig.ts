@@ -15,13 +15,19 @@ export const chaosConfig = {
   bossSpawnSafeMarginPx: 40,
   bossSpawnHeaderExclusionPx: 80,
   bossRandomSpawnEnabled: true,
-  maxBossesOnScreen: 1,
-  maxBossBubblesOnScreen: 1,
+  maxBossesOnScreen: 2,
+  maxBossBubblesOnScreen: 2,
+
+  // Transition Sequence
+  transitionFlashDuration: 800,
+  transitionCallingDuration: 500,
+  transitionSlideDuration: 1000,
   
   // Chaos Sabotage
   sabotageWhileTypingEnabled: true,
-  sabotageWhileTypingIntervalMs: 10000,
-  sabotageWhileTypingChance: 0.2,
+  sabotageWhileTypingIntervalMs: 6000,
+  sabotageWhileTypingChance: 0.3,
+  maxInsertedLength: 3,
   
   // Time Check
   timeCheckUpdateIntervalMs: 1000,
@@ -30,10 +36,11 @@ export const chaosConfig = {
   lifeAdviceEnabled: true,
   
   // Easter Eggs
-  blueUnderlineProbability: 0.1,
-  correctWordUnderlineChance: 0.2,
+  blueUnderlineProbability: 0.2,
+  correctWordUnderlineChance: 0.3,
   correctWordMinLength: 4,
   correctWordTooltipEnabled: true,
+  maxUnderlinesAtOnce: 5,
   
   // Features
   enableFocusGaslighting: true,
