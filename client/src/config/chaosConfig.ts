@@ -19,9 +19,9 @@ export const chaosConfig = {
   maxBossBubblesOnScreen: 2,
 
   // Transition Sequence
-  transitionFlashDuration: 600,
+  transitionFlashDuration: 400,
   transitionCallingDuration: 400,
-  transitionSlideDuration: 800,
+  transitionSlideDuration: 400,
   
   // Chaos Sabotage
   sabotageWhileTypingEnabled: true,
