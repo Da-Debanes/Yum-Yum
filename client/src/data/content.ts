@@ -9,6 +9,21 @@ export const FRIEND_SUGGESTIONS = [
   "Try console.logging the output.",
   "A switch statement might be cleaner.",
   "Don't forget about accessibility!",
+  "Is this code DRY (Don't Repeat Yourself)?",
+  "Maybe use a library for this instead?",
+  "Should this be an async function?",
+  "Is this performing well for large datasets?",
+  "Could you use a more modern ES6 feature here?",
+  "Have you tested this in Safari? It's the new IE.",
+  "Maybe add some unit tests for this block?",
+  "Is this secure against SQL injection?",
+  "Should this be a constant instead of a let?",
+  "Maybe wrap this in a try-catch block?",
+  "Is the indentation consistent throughout?",
+  "Could this be more readable with a ternary operator?",
+  "Have you thought about the mobile experience?",
+  "Maybe use a state management library like Redux?",
+  "Is this component too large? Should it be split?",
 ];
 
 export const COMPLIMENTS = [
@@ -19,6 +34,9 @@ export const COMPLIMENTS = [
   "Apologies, I'm just a simple algorithm.",
   "You're on a different level, I see.",
   "I shouldn't have doubted your intuition.",
+  "Wow, that's some clean code. I'll stay quiet.",
+  "Brilliant! I can learn a lot from you.",
+  "Exactly! I was just testing you.",
 ];
 
 export const MANAGER_BRAINROT = [
@@ -37,6 +55,16 @@ export const MANAGER_BRAINROT = [
   "Think outside the box!",
   "Let's pivot to video.",
   "Optimize for the metaverse.",
+  "Can we add a chat bot to this?",
+  "We need more engagement metrics.",
+  "Is this scalable to 1 billion users?",
+  "Let's do a deep dive into the KPIs.",
+  "We need to monetize this interaction.",
+  "Where is the gamification?",
+  "Can we use more 'vibrant' colors?",
+  "I want this to feel more 'premium'.",
+  "Let's A/B test the font size.",
+  "We need to disrupt the industry!",
 ];
 
 export const SABOTAGE_WORDS = [
@@ -55,6 +83,13 @@ export const SABOTAGE_WORDS = [
   "disruptive",
   "innovative",
   "thought leader",
+  "rizz",
+  "sigma",
+  "lurk",
+  "ratio",
+  "cap",
+  "no cap",
+  "bussin",
 ];
 
 export const MANAGER_NAMES = [
@@ -62,4 +97,5 @@ export const MANAGER_NAMES = [
   "Chad 'The Visionary' Smith",
   "Crypto Bro Kevin",
   "Agile Coach Karen",
+  "Sharky McCEO",
 ];
