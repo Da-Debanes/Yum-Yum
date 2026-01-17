@@ -12,9 +12,27 @@ interface EditorProps {
 export function Editor({ phase, text, setText, onFocus }: EditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [highlightedText, setHighlightedText] = useState<React.ReactNode[]>([]);
+  const lastActivity = useRef(Date.now());
 
-  const charCount = text.length;
-  const wordCount = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+  useEffect(() => {
+    lastActivity.current = Date.now();
+  }, [text]);
+
+  // Sabotage during typing
+  useEffect(() => {
+    if (phase !== "MANAGERS" || !chaosConfig.enableSabotage || !chaosConfig.sabotageWhileTypingEnabled) return;
+
+    const interval = setInterval(() => {
+      const isTyping = Date.now() - lastActivity.current < 1000;
+      if (!isTyping) return;
+      if (Math.random() > chaosConfig.sabotageWhileTypingChance) return;
+
+      const word = SABOTAGE_WORDS[Math.floor(Math.random() * SABOTAGE_WORDS.length)];
+      setText(text + " " + word.toUpperCase() + " ");
+    }, chaosConfig.sabotageWhileTypingIntervalMs);
+
+    return () => clearInterval(interval);
+  }, [phase, text, setText]);
 
   // Blue underline logic
   useEffect(() => {
@@ -25,13 +43,15 @@ export function Editor({ phase, text, setText, onFocus }: EditorProps) {
 
     const words = text.split(/(\s+)/);
     const highlighted = words.map((word, i) => {
-      if (word.length >= 4 && /^[a-zA-Z]+$/.test(word) && Math.random() < chaosConfig.blueUnderlineProbability) {
+      if (word.length >= chaosConfig.correctWordMinLength && /^[a-zA-Z]+$/.test(word) && Math.random() < chaosConfig.correctWordUnderlineChance) {
         return (
           <span key={i} className="relative group inline-block">
-            <span className="border-b-2 border-blue-400">{word}</span>
-            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-blue-500 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-50">
-              The word is spelled correctly. Good job!
-            </span>
+            <span className="border-b-2 border-blue-400 cursor-help">{word}</span>
+            {chaosConfig.correctWordTooltipEnabled && (
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-blue-600 text-white text-[10px] px-2 py-1 rounded-md shadow-lg z-50 whitespace-nowrap">
+                ✅ '{word}' is spelled correctly. Good job!
+              </span>
+            )}
           </span>
         );
       }
@@ -40,32 +60,14 @@ export function Editor({ phase, text, setText, onFocus }: EditorProps) {
     setHighlightedText(highlighted);
   }, [text, phase]);
 
-  useEffect(() => {
-    if (phase !== "MANAGERS" || !chaosConfig.enableSabotage) return;
-
-    const interval = setInterval(() => {
-      if (Math.random() > chaosConfig.gaslightingProbability) return;
-
-      const sabotageType = Math.random();
-      if (sabotageType > 0.7) {
-        const word = SABOTAGE_WORDS[Math.floor(Math.random() * SABOTAGE_WORDS.length)];
-        setText(text + " " + word.toUpperCase() + " ");
-      } else if (sabotageType > 0.9) {
-        setText(text.slice(0, -5));
-      }
-    }, chaosConfig.sabotageFrequency);
-
-    return () => clearInterval(interval);
-  }, [phase, text, setText]);
-
   return (
     <div className="w-full h-full relative font-mono shadow-2xl rounded-lg overflow-hidden border border-border flex flex-col">
       <div className="bg-muted border-b border-border px-4 py-2 text-xs text-muted-foreground flex justify-between items-center z-20">
         <div className="flex items-center gap-4">
           <span className="font-bold">main.ts</span>
           <div className="flex gap-3 opacity-60">
-            <span>Chars: <span className="text-foreground">{charCount}</span></span>
-            <span>Words: <span className="text-foreground">{wordCount}</span></span>
+            <span>Chars: {text.length}</span>
+            <span>Words: {text.trim() === "" ? 0 : text.trim().split(/\s+/).length}</span>
           </div>
         </div>
         <div className="flex gap-2">
@@ -75,8 +77,7 @@ export function Editor({ phase, text, setText, onFocus }: EditorProps) {
         </div>
       </div>
       <div className="flex-1 relative bg-card">
-        {/* Highlight Layer */}
-        <div className="absolute inset-0 pt-4 px-6 pb-6 text-lg leading-relaxed text-transparent whitespace-pre-wrap pointer-events-none break-words">
+        <div className="absolute inset-0 pt-4 px-6 pb-6 text-lg leading-relaxed text-transparent whitespace-pre-wrap pointer-events-none break-words overflow-hidden">
           {highlightedText}
         </div>
         <textarea

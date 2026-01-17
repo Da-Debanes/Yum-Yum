@@ -9,7 +9,9 @@ export interface Suggestion {
   text: string;
   type: "FRIEND" | "MANAGER";
   side: "LEFT" | "RIGHT";
-  slot: number; // For non-overlapping layout
+  slot: number;
+  x?: number;
+  y?: number;
 }
 
 export function useChaosMachine(currentText: string) {
@@ -20,31 +22,26 @@ export function useChaosMachine(currentText: string) {
   const [lastCompliment, setLastCompliment] = useState<string | null>(null);
   
   const hasTyped = useRef(false);
-  const typingTimer = useRef<NodeJS.Timeout | null>(null);
+  const lastActivityTime = useRef(Date.now());
+  const lastSuggestionTime = useRef(0);
   const lastSuggestionSide = useRef<"LEFT" | "RIGHT">("RIGHT");
   const usedFriendSuggestions = useRef<Set<string>>(new Set());
   const usedManagerSuggestions = useRef<Set<string>>(new Set());
 
-  // Debounced typing detection
+  // Activity detection
   useEffect(() => {
     if (currentText.trim().length > 0) {
-      if (typingTimer.current) clearTimeout(typingTimer.current);
-      
-      typingTimer.current = setTimeout(() => {
-        hasTyped.current = true;
-      }, chaosConfig.typingDebounce);
+      hasTyped.current = true;
+      lastActivityTime.current = Date.now();
     }
   }, [currentText]);
 
-  // Phase transition logic
+  // Phase transition
   useEffect(() => {
     if (phase === "FRIENDS" && rejectionCount >= chaosConfig.rejectionsToManagers) {
       setPhase("TRANSITION");
       setSuggestions([]); 
-      
-      setTimeout(() => {
-        setPhase("MANAGERS");
-      }, chaosConfig.managerTransitionDuration);
+      setTimeout(() => setPhase("MANAGERS"), chaosConfig.managerTransitionDuration);
     }
   }, [phase, rejectionCount]);
 
@@ -56,32 +53,38 @@ export function useChaosMachine(currentText: string) {
     return selection;
   };
 
-  // Generate suggestions
+  // Suggestion loop
   useEffect(() => {
     if (phase === "TRANSITION") return;
     if (phase === "FRIENDS" && !hasTyped.current) return;
 
-    const intervalTime = phase === "FRIENDS" ? chaosConfig.friendSuggestionInterval : 2000;
-    
     const interval = setInterval(() => {
+      const now = Date.now();
+      const isTyping = now - lastActivityTime.current < 1000;
+      
+      // Check if we should suggest based on mode
+      if (phase === "FRIENDS") {
+        const cooldown = isTyping ? chaosConfig.friendsWhileTypingIntervalMs : chaosConfig.friendSuggestionInterval;
+        if (now - lastSuggestionTime.current < cooldown) return;
+        if (isTyping && !chaosConfig.friendsSuggestWhileTyping) return;
+        if (isTyping && Math.random() > chaosConfig.friendsWhileTypingChance) return;
+      } else {
+        if (now - lastSuggestionTime.current < 2000) return;
+      }
+
+      lastSuggestionTime.current = now;
       let text = "";
+      
       if (phase === "FRIENDS") {
         const lowerText = currentText.toLowerCase();
-        const useContext = Math.random() > 0.4;
-        
-        if (useContext && (lowerText.includes("function") || lowerText.includes("=>"))) {
+        if (lowerText.includes("function") || lowerText.includes("=>")) {
           text = "I noticed you're using functions. Have you considered a 'Factory Pattern'? It adds 400 lines but feels very professional.";
-        } else if (useContext && lowerText.includes("import")) {
-          text = "Instead of importing this, could you copy-paste the source code? It's better for 'local first' development.";
         } else {
           text = getUniqueSuggestion(FRIEND_SUGGESTIONS, usedFriendSuggestions.current);
         }
       } else {
-        // Escalate brainrot based on managerRejectionCount
         text = getUniqueSuggestion(MANAGER_BRAINROT, usedManagerSuggestions.current);
-        if (managerRejectionCount > 3) {
-          text = text.toUpperCase() + " !!! " + (Math.random() > 0.5 ? "SKIBIDI" : "RIZZ");
-        }
+        if (managerRejectionCount > 3) text = text.toUpperCase() + " !!! " + (Math.random() > 0.5 ? "SKIBIDI" : "RIZZ");
       }
       
       const nextSide = lastSuggestionSide.current === "LEFT" ? "RIGHT" : "LEFT";
@@ -92,17 +95,18 @@ export function useChaosMachine(currentText: string) {
         text,
         type: phase === "FRIENDS" ? "FRIEND" : "MANAGER",
         side: nextSide,
-        slot: Math.floor(Math.random() * 3) // 3 possible slots per side
+        slot: Math.floor(Math.random() * 3),
+        x: chaosConfig.bossRandomSpawnEnabled && phase === "MANAGERS" ? 10 + Math.random() * 80 : undefined,
+        y: chaosConfig.bossRandomSpawnEnabled && phase === "MANAGERS" ? 15 + Math.random() * 70 : undefined
       };
 
       setSuggestions((prev) => {
-        const max = phase === "FRIENDS" ? 1 : 6;
+        const max = phase === "FRIENDS" ? 1 : 8;
         if (prev.length >= max) return prev;
-        // Check for slot collision on same side
-        if (prev.some(s => s.side === newSuggestion.side && s.slot === newSuggestion.slot)) return prev;
+        if (phase === "FRIENDS" && prev.length > 0) return prev;
         return [...prev, newSuggestion];
       });
-    }, intervalTime);
+    }, 500);
 
     return () => clearInterval(interval);
   }, [phase, currentText, managerRejectionCount]);
@@ -110,9 +114,7 @@ export function useChaosMachine(currentText: string) {
   const rejectSuggestion = useCallback((id: string) => {
     setSuggestions((prev) => prev.filter((s) => s.id !== id));
     setRejectionCount((prev) => prev + 1);
-    if (phase === "MANAGERS") {
-      setManagerRejectionCount(prev => prev + 1);
-    }
+    if (phase === "MANAGERS") setManagerRejectionCount(prev => prev + 1);
     const compliment = COMPLIMENTS[Math.floor(Math.random() * COMPLIMENTS.length)];
     setLastCompliment(compliment);
     setTimeout(() => setLastCompliment(null), 3000);

@@ -1,0 +1,105 @@
+You are modifying an existing hackathon website (friends → managers → chaos). Implement the following revisions cleanly. Keep behavior configurable via the existing config file. Do not hardcode timing/positions inside components.
+
+========================================================
+REVISION 1) Suggestions should happen even while typing
+========================================================
+Currently suggestions trigger only after typing stops (debounce). Change this so:
+- After the user STARTS typing, suggestions can appear even while they are still typing.
+- Do this without spamming: implement a configurable “typing suggestion cadence”, e.g.
+  - minimum interval between suggestions while typing (e.g. 2–4 seconds)
+  - optional probability per interval
+- Keep the editor responsive; suggestions must not block typing.
+- Keep the original debounce-based trigger optional via config (so we can switch modes).
+
+Config additions (examples):
+- friendsSuggestWhileTyping: boolean
+- friendsWhileTypingIntervalMs: number
+- friendsWhileTypingChance: 0..1
+
+========================================================
+REVISION 2) Chaos mode bosses can pop up anywhere, but must remain rejectable
+========================================================
+In chaos mode:
+- Boss suggestion popups/bubbles may appear anywhere on screen (random positions).
+- HOWEVER: ensure every bubble is always clickable and rejectable:
+  - must not spawn under/behind the top bar / header
+  - must not be partially off-screen
+  - must respect safe margins from edges and UI elements
+Implementation:
+- Define a “safe area” rectangle for random placement:
+  - exclude header height + padding
+  - exclude bottom UI (if any)
+- Constrain random x/y to safe area.
+- Maintain a z-index high enough to be clickable.
+- Each bubble must have a visible Reject button that always works.
+
+Add config options:
+- bossSpawnSafeMarginPx
+- bossSpawnHeaderExclusionPx (or detect header height)
+- bossRandomSpawnEnabled
+
+========================================================
+REVISION 3) Brainrot insertions should occur mid-typing
+========================================================
+Change sabotage timing so insertions/replacements can happen WHILE the user is actively typing (not only when idle).
+Requirements:
+- Use a timer that runs during typing sessions.
+- Prefer small sabotage (short insertion/replacement) so it’s funny not catastrophic.
+- Must remain undoable (Ctrl+Z).
+Implementation guidance:
+- Track “isTyping” state (based on recent keypress timestamps).
+- If isTyping == true and in chaos mode, allow sabotage events at a configurable frequency.
+- Optional: increase chance if user is typing fast.
+
+Config additions:
+- sabotageWhileTypingEnabled
+- sabotageWhileTypingIntervalMs (range or min/max)
+- sabotageWhileTypingChance
+
+========================================================
+REVISION 4) Time-check popup: next suggested time must be on a perfect 5-min mark
+========================================================
+In the chaos-mode time-check popup:
+- The “current time” displayed must be real, live, and updating (HH:MM:SS).
+- The “suggested start time” must be the NEXT time in the format:
+  - HH:M{0 or 5}:00 (i.e., the next 5-minute boundary)
+Examples:
+- If current time is 15:43:37 → suggest 15:45:00
+- If current time is 15:45:01 → suggest 15:50:00
+- If current time is 15:59:59 → suggest 16:00:00
+Implementation:
+- Compute next 5-minute mark from Date() each time popup renders/updates.
+- Suggested time does not need to tick every second, but must be correct based on current time.
+
+Add config:
+- timeCheckUpdateIntervalMs (e.g. 250–1000ms)
+
+========================================================
+REVISION 5) Spellchecker underline hover should behave like a real spellchecker tooltip
+========================================================
+The “correct spelling” underline feature must behave like a normal spellchecker:
+- Underlined word shows a tooltip ONLY when mouse hovers over that underlined word.
+- Tooltip text should include the specific word, e.g.:
+  “✅ ‘accommodate’ is spelled correctly. Good job!”
+- Tooltip should appear near the word (not fixed in a corner).
+Implementation notes:
+- If using a textarea with an overlay renderer, render underlined words as spans with:
+  - blue underline styling
+  - onMouseEnter/onMouseMove to position tooltip near cursor/word
+  - onMouseLeave hides tooltip
+- If using Monaco/CodeMirror, use decoration hover providers / hover tooltips.
+
+Config additions:
+- correctWordUnderlineChance
+- correctWordMinLength
+- correctWordTooltipEnabled
+
+========================================================
+DELIVERABLES / ACCEPTANCE
+========================================================
+- Suggestions can appear during typing (not just after).
+- Boss bubbles can appear anywhere, but never behind header and always rejectable.
+- Brainrot sabotage can happen mid-typing and is undoable.
+- Time-check suggested start time always rounds up to next 5-minute boundary.
+- Correct-word underlines show hover tooltips per-word like a spellchecker.
+- All new behavior tunable via config + documented briefly in README (“How to tune” + “How to demo”).
