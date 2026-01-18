@@ -20,24 +20,28 @@ export function runTransitionSequence({
   let isActive = true;
   const { flashDuration, callingDuration, slideDuration } = timings;
 
-  const flashTimer = setTimeout(() => {
-    if (isActive) onStep("CALLING");
-  }, flashDuration);
+  onStep("CALLING");
 
   const callingTimer = setTimeout(() => {
-    if (isActive) onStep("SLIDE");
-  }, flashDuration + callingDuration);
+    if (!isActive) return;
+    onStep("SLIDE");
+  }, callingDuration);
 
   const slideTimer = setTimeout(() => {
     if (!isActive) return;
+    onStep("FLASH");
+  }, callingDuration + slideDuration);
+
+  const flashTimer = setTimeout(() => {
+    if (!isActive) return;
     onStep("NONE");
     onComplete();
-  }, flashDuration + callingDuration + slideDuration);
+  }, callingDuration + slideDuration + flashDuration);
 
   return () => {
     isActive = false;
-    clearTimeout(flashTimer);
     clearTimeout(callingTimer);
     clearTimeout(slideTimer);
+    clearTimeout(flashTimer);
   };
 }

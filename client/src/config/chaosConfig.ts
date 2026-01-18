@@ -20,13 +20,14 @@ export const chaosConfig = {
 
   // Transition Sequence
   transitionFlashDuration: 400,
-  transitionCallingDuration: 400,
+  transitionCallingDuration: 800,
   transitionSlideDuration: 400,
   
   // Chaos Sabotage
   sabotageWhileTypingEnabled: true,
   sabotageWhileTypingIntervalMs: 6000,
   sabotageWhileTypingChance: 0.3,
+  sabotageIdleInsertChance: 0.1,
   maxInsertedLength: 3,
   
   // Time Check

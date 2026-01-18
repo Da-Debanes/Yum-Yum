@@ -10,7 +10,7 @@ async function runTest() {
   const flashDuration = 10;
   const callingDuration = 10;
   const slideDuration = 10;
-  const totalDuration = flashDuration + callingDuration + slideDuration;
+  const totalDuration = callingDuration + slideDuration + flashDuration;
 
   const cleanup = runTransitionSequence({
     onStep: (step) => steps.push(step),
@@ -28,6 +28,7 @@ async function runTest() {
 
   assert.equal(completeCount, 1, "onComplete should fire exactly once");
   assert.equal(steps.at(-1), "NONE", "final step should be NONE");
+  assert.equal(steps[0], "CALLING", "first step should be CALLING");
 
   const stepsAfterComplete = steps.length;
   await sleep(totalDuration);
