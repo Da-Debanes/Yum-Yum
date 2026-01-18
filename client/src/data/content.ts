@@ -1,14 +1,12 @@
 export const FRIEND_SUGGESTIONS = [
-  "The tone could be more tone-like. Have you considered using words?",
-  "Consider making this sentence more 'clear'.",
+  "This sentence could benefit from increased clarity.",
+  "The tone here may not fully align with its intended audience.",
   "Try adding a stronger transition... somewhere in this paragraph.",
   "Your thesis is strong, but what if it was even stronger? Try adding adjectives.",
-  "The flow here is reminiscent of a river. A very confusing river.",
   "I noticed a distinct lack of semi-colons. Professional writers love semi-colons.",
   "This paragraph is quite long. Or maybe it's too short. Hard to tell.",
-  "Consider using a more formal synonym for the word 'the'.",
-  "Your argument is logical, which might alienate readers who prefer vibes.",
-  "Try ending this essay with a question. Like 'Why did I write this?'"
+  "Some phrasing here could be streamlined for readability.",
+  "Try ending this essay with a question."
 ];
 
 export const COMPLIMENTS = [
@@ -22,14 +20,14 @@ export const COMPLIMENTS = [
 ];
 
 export const MANAGER_BRAINROT = [
-  "CAN WE MAKE THIS VIBE-CHECK COMPATIBLE? !!! RIZZ",
+  "CONSIDER USING A MORE FORMAL SYNONYM FOR THE WORD 'THE'. !!! GYATT",
+  "THE FLOW HERE IS LIKE A RIVER. A VERY CONFUSING RIVER. !!! BRRR",
   "LEVERAGE THE SYNERGY OF THIS PARAGRAPH! !!! SKIBIDI",
+  "YOUR ARGUMENT IS LOGICAL, WHICH MAY ALIENATE READERS WHO PREFER VIBES. !!! SKIBIDI",
   "IS THIS ESSAY SCALABLE TO 1 BILLION READERS? !!! RIZZ",
   "WE NEED MORE ENGAGEMENT METRICS ON THIS SENTENCE! !!! SKIBIDI",
-  "LET'S DO A DEEP DIVE INTO THESE ADJECTIVES. !!! RIZZ",
-  "THINK OUTSIDE THE BOX! !!! SKIBIDI",
-  "LET'S CIRCLE BACK ON THIS CONCLUSION OFFLINE. !!! RIZZ",
-  "THIS THESIS LACKS DELIVERABLES. !!! SKIBIDI"
+  "CAN WE MAKE THIS VIBE-CHECK COMPATIBLE? !!! BRRRR",
+  "LET'S CIRCLE BACK ON THIS CONCLUSION OFFLINE. !!! RIZZ"
 ];
 
 export const SABOTAGE_WORDS = [
